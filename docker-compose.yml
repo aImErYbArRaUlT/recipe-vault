@@ -1,0 +1,37 @@
+# Local development stack: Postgres 16 plus the app.
+# Copy .env.example to .env first, then run: docker compose up --build
+# DATABASE_URL below overrides any value in .env to point at the db service.
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: recipevault
+      POSTGRES_PASSWORD: recipevault
+      POSTGRES_DB: recipevault
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U recipevault"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      DATABASE_URL: postgres://recipevault:recipevault@db:5432/recipevault
+    ports:
+      - "3000:3000"
+
+volumes:
+  db-data:
