@@ -7,6 +7,7 @@ import { requireDailyAiCredit } from "@/lib/middleware/ai-limits";
 import { db } from "@/lib/db";
 import { recipes } from "@/lib/db/schema";
 import { extractJson, generateText } from "@/lib/ai/gemini";
+import { toRecipeSnapshot } from "@/lib/services/recipe-snapshot";
 
 const burst = rateLimit({ limit: 15, windowMs: 60_000 });
 
@@ -39,20 +40,7 @@ export const POST = withAuth(async (req, user) => {
   }
 
   const prompt = `You are modifying a recipe. Return ONLY JSON.
-Recipe: ${JSON.stringify({
-    title: recipe.title,
-    description: recipe.description,
-    ingredients: recipe.ingredients,
-    steps: recipe.steps,
-    prep_time_minutes: recipe.prepTimeMinutes,
-    cook_time_minutes: recipe.cookTimeMinutes,
-    total_time_minutes: recipe.totalTimeMinutes,
-    servings: recipe.servings,
-    cuisine: recipe.cuisine,
-    tags: recipe.tags,
-    difficulty: recipe.difficulty,
-    nutrition: recipe.nutrition,
-  })}
+Recipe: ${JSON.stringify(toRecipeSnapshot(recipe))}
 User request: ${parsed.data.request}
 Return the full updated recipe JSON.`;
 

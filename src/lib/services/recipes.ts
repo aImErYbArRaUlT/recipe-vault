@@ -3,6 +3,7 @@ import { db } from "@/lib/db";
 import { recipes } from "@/lib/db/schema";
 import { getUserRecipes } from "@/lib/middleware/data-access";
 import { createRecipeVersion } from "@/lib/services/recipe-versions";
+import { toRecipeSnapshot, toRecipeWriteFields } from "@/lib/services/recipe-snapshot";
 
 export async function listRecipes(userId: string) {
   return getUserRecipes(userId);
@@ -22,22 +23,12 @@ export async function createRecipe(userId: string, input: {
   difficulty?: string | null;
   nutrition?: Record<string, unknown> | null;
 }) {
+  const snapshot = toRecipeSnapshot(input, { servingsFallback: 4 });
   const [recipe] = await db
     .insert(recipes)
     .values({
       userId,
-      title: input.title,
-      description: input.description ?? null,
-      ingredients: input.ingredients ?? [],
-      steps: input.steps ?? [],
-      prepTimeMinutes: input.prepTimeMinutes ?? null,
-      cookTimeMinutes: input.cookTimeMinutes ?? null,
-      totalTimeMinutes: input.totalTimeMinutes ?? null,
-      servings: input.servings ?? 4,
-      cuisine: input.cuisine ?? null,
-      tags: input.tags ?? [],
-      difficulty: input.difficulty ?? null,
-      nutrition: input.nutrition ?? null,
+      ...toRecipeWriteFields(snapshot),
     })
     .returning();
 
@@ -80,20 +71,7 @@ export async function updateRecipe(
     version: existing.version ?? 1,
     changedById: userId,
     changedByName: existing.forkedFromUser ?? "User",
-    snapshot: {
-      title: existing.title,
-      description: existing.description,
-      ingredients: existing.ingredients,
-      steps: existing.steps,
-      prep_time_minutes: existing.prepTimeMinutes,
-      cook_time_minutes: existing.cookTimeMinutes,
-      total_time_minutes: existing.totalTimeMinutes,
-      servings: existing.servings,
-      cuisine: existing.cuisine,
-      tags: existing.tags,
-      difficulty: existing.difficulty,
-      nutrition: existing.nutrition,
-    },
+    snapshot: toRecipeSnapshot(existing),
     changesSummary: input.changesSummary ?? "Recipe updated",
   });
 

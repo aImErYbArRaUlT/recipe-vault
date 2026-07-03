@@ -5,6 +5,7 @@ import { isGeminiTransientError, scanRecipeFromImages, type GeminiScanResult } f
 import { createThumbnail } from "@/lib/images";
 import { uploadFile } from "@/lib/r2";
 import { buildStorageKey } from "@/lib/storage";
+import { toRecipeSnapshot, toRecipeWriteFields } from "@/lib/services/recipe-snapshot";
 
 export async function createScanJob(userId: string, imageUrls: string[]) {
   const [job] = await db
@@ -116,12 +117,6 @@ interface ScanOverrides {
   tags?: string;
 }
 
-function toIntOrNull(value: string | number | undefined | null): number | null {
-  if (value === undefined || value === null || value === "") return null;
-  const n = Number(value);
-  return isNaN(n) || n <= 0 ? null : n;
-}
-
 export async function confirmScanJob(userId: string, jobId: string, overrides: ScanOverrides = {}) {
   const job = await db.query.scanJobs.findFirst({
     where: and(eq(scanJobs.id, jobId), eq(scanJobs.userId, userId)),
@@ -138,27 +133,28 @@ export async function confirmScanJob(userId: string, jobId: string, overrides: S
   const tags = overrides.tags !== undefined
     ? overrides.tags.split(",").map((t) => t.trim()).filter(Boolean)
     : (parsed.tags as string[]) ?? [];
+  const snapshot = toRecipeSnapshot({
+    ...parsed,
+    title,
+    description: description || null,
+    tags,
+    prep_time_minutes: overrides.prepTimeMinutes ?? parsed.prep_time_minutes,
+    cook_time_minutes: overrides.cookTimeMinutes ?? parsed.cook_time_minutes,
+    total_time_minutes: overrides.totalTimeMinutes ?? parsed.total_time_minutes,
+    servings: overrides.servings ?? parsed.servings,
+    cuisine: overrides.cuisine?.trim() || parsed.cuisine,
+    difficulty: overrides.difficulty?.trim() || parsed.difficulty,
+  });
 
   const [recipe] = await db
     .insert(recipes)
     .values({
       userId,
-      title,
-      description: description || null,
       sourceType: "scan",
       originalImageUrls: job.imageUrls,
       ocrRawText: job.rawOcrText,
       ocrConfidence: job.confidence,
-      ingredients: (parsed.ingredients as object[]) ?? [],
-      steps: (parsed.steps as object[]) ?? [],
-      prepTimeMinutes: toIntOrNull(overrides.prepTimeMinutes ?? parsed.prep_time_minutes as string | number | undefined),
-      cookTimeMinutes: toIntOrNull(overrides.cookTimeMinutes ?? parsed.cook_time_minutes as string | number | undefined),
-      totalTimeMinutes: toIntOrNull(overrides.totalTimeMinutes ?? parsed.total_time_minutes as string | number | undefined),
-      servings: toIntOrNull(overrides.servings ?? parsed.servings as string | number | undefined),
-      cuisine: (overrides.cuisine?.trim() || (typeof parsed.cuisine === "string" ? parsed.cuisine : null)) || null,
-      tags,
-      difficulty: (overrides.difficulty?.trim() || (typeof parsed.difficulty === "string" ? parsed.difficulty : null)) || null,
-      nutrition: (parsed.nutrition as object) ?? null,
+      ...toRecipeWriteFields(snapshot),
     })
     .returning();
 
