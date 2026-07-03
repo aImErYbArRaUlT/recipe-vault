@@ -1,0 +1,368 @@
+@import "tailwindcss";
+
+:root {
+  /* === Surface palette (parchment + warm cream) === */
+  --paper: #f7f2ea;
+  --paper-deep: #ede2d1;
+  --paper-sunken: #efe6d8;
+  --surface: #fffaf5;
+  --surface-raised: #ffffff;
+  --surface-ink: #1f1a17;
+
+  /* === Ink (text) === */
+  --ink: #1f1a17;
+  --ink-muted: #5c544c;
+  --ink-soft: #847a6f;
+  --ink-inverse: #fffaf5;
+
+  /* === Rules / borders === */
+  --rule: #e6d8cd;
+  --rule-strong: #c9b7a5;
+  --rule-faint: #efe6d8;
+
+  /* === Accent (terracotta) === */
+  --accent: #c35a38;
+  --accent-deep: #9a4225;
+  --accent-soft: #f3d6c9;
+  --accent-paper: #fbe9dd;
+
+  /* === Semantic (chosen to harmonize with terracotta, not Tailwind defaults) === */
+  --moss: #5b6f4a;
+  --moss-soft: #d8e0cc;
+  --mustard: #b88a2c;
+  --mustard-soft: #f3e5be;
+  --oxblood: #7a2618;
+  --oxblood-soft: #f1d2cb;
+  --indigo-ink: #2f3a5a;
+  --indigo-soft: #d4dae7;
+
+  /* === Radii === */
+  --radius-input: 12px;
+  --radius-card: 18px;
+  --radius-card-lg: 28px;
+  --radius-pill: 999px;
+
+  /* === Shadows (soft, paper-like) === */
+  --shadow-flat: none;
+  --shadow-raised:
+    0 1px 0 rgba(31, 26, 23, 0.04),
+    0 4px 14px -2px rgba(31, 26, 23, 0.06);
+  --shadow-lifted:
+    0 1px 0 rgba(31, 26, 23, 0.04),
+    0 18px 44px -10px rgba(31, 26, 23, 0.16);
+  --shadow-sunken: inset 0 1px 2px rgba(31, 26, 23, 0.06);
+  --shadow-emboss:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    0 1px 0 rgba(31, 26, 23, 0.06);
+  --shadow-focus: 0 0 0 3px rgba(195, 90, 56, 0.28);
+
+  /* === Motion === */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast: 160ms;
+  --duration-base: 240ms;
+  --duration-slow: 420ms;
+
+  /* === Safe area === */
+  --safe-area-top: env(safe-area-inset-top);
+  --safe-area-bottom: env(safe-area-inset-bottom);
+  --safe-area-left: env(safe-area-inset-left);
+  --safe-area-right: env(safe-area-inset-right);
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-deep: var(--paper-deep);
+  --color-surface: var(--surface);
+  --color-surface-raised: var(--surface-raised);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-soft: var(--ink-soft);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-accent: var(--accent);
+  --color-accent-deep: var(--accent-deep);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-paper: var(--accent-paper);
+  --color-moss: var(--moss);
+  --color-moss-soft: var(--moss-soft);
+  --color-mustard: var(--mustard);
+  --color-mustard-soft: var(--mustard-soft);
+  --color-oxblood: var(--oxblood);
+  --color-oxblood-soft: var(--oxblood-soft);
+
+  /* Legacy aliases so existing classes keep working */
+  --color-background: var(--paper);
+  --color-foreground: var(--ink);
+  --color-border: var(--rule);
+
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-serif:
+    var(--font-fraunces), ui-serif, "Iowan Old Style", Georgia, serif;
+}
+
+/* Maintain backward-compat for var(--background) / var(--border) / var(--surface) refs in legacy pages */
+:root {
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --border: var(--rule);
+}
+
+/* === Base === */
+html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(
+      1100px 600px at 8% -10%,
+      #fff4e6 0%,
+      transparent 55%
+    ),
+    radial-gradient(
+      900px 700px at 95% 110%,
+      #f3e3d0 0%,
+      transparent 60%
+    );
+  color: var(--ink);
+  font-family: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: "ss01" on, "cv11" on;
+  font-variant-numeric: oldstyle-nums proportional-nums;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Paper grain - fixed full-viewport noise overlay. Inline SVG keeps it cacheable + zero network. */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.22;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220' viewBox='0 0 220 220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.92' numOctaves='2' stitchTiles='stitch' seed='3'/><feColorMatrix values='0 0 0 0 0.43  0 0 0 0 0.34  0 0 0 0 0.27  0 0 0 0.55 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 220px 220px;
+}
+
+/* Ensure all page content sits above the grain layer */
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Headings use Fraunces with optical sizing tuned for editorial weight */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-fraunces), ui-serif, "Iowan Old Style", Georgia, serif;
+  font-variation-settings: "opsz" 96, "SOFT" 50, "WONK" 0;
+  letter-spacing: -0.012em;
+  color: var(--ink);
+}
+
+h1 {
+  font-variation-settings: "opsz" 144, "SOFT" 50;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+}
+
+h2 {
+  font-variation-settings: "opsz" 96, "SOFT" 50;
+  font-weight: 500;
+}
+
+h3,
+h4 {
+  font-variation-settings: "opsz" 56, "SOFT" 50;
+  font-weight: 600;
+}
+
+/* Body text refinements */
+p,
+li {
+  font-feature-settings: "ss01" on, "cv11" on, "kern" on;
+}
+
+/* Form controls - never use placeholder-as-label.
+   These keep placeholders subtle; real labels are required by primitives. */
+input,
+textarea,
+select,
+button {
+  font-family: inherit;
+  font-feature-settings: inherit;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: var(--ink-soft);
+  opacity: 0.7;
+}
+
+/* === Focus system (keyboard-only, terracotta ring) === */
+:where(a, button, [role="button"], input, textarea, select, [tabindex]):focus {
+  outline: none;
+}
+
+:where(a, button, [role="button"], input, textarea, select, [tabindex]):focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  border-radius: max(var(--radius-input), 4px);
+}
+
+/* === Decorative utilities === */
+.eyebrow {
+  font-family: var(--font-manrope), ui-sans-serif, system-ui;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.eyebrow-muted {
+  font-family: var(--font-manrope), ui-sans-serif, system-ui;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.serif-display {
+  font-family: var(--font-fraunces), ui-serif, "Iowan Old Style", Georgia, serif;
+  font-variation-settings: "opsz" 144, "SOFT" 30;
+  letter-spacing: -0.025em;
+  font-weight: 500;
+}
+
+.tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+.rule-deckle {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 6' preserveAspectRatio='none'><path d='M0 3 Q 10 1 20 3 T 40 3 T 60 3 T 80 3 T 100 3 T 120 3 T 140 3 T 160 3 T 180 3 T 200 3' fill='none' stroke='%23c9b7a5' stroke-width='1' stroke-linecap='round'/></svg>");
+  background-repeat: no-repeat;
+  background-size: 100% 6px;
+  height: 6px;
+}
+
+.ink-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--rule-strong) 18%, var(--rule-strong) 82%, transparent);
+}
+
+.scan-shadow {
+  filter: drop-shadow(0 14px 32px rgba(31, 26, 23, 0.18));
+}
+
+.scan-frame {
+  background: var(--surface-raised);
+  padding: 10px;
+  border: 1px solid var(--rule);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 2px rgba(31, 26, 23, 0.04),
+    0 18px 30px -16px rgba(31, 26, 23, 0.25);
+  transform: rotate(-0.6deg);
+}
+
+/* === Reveal animations (entrance) === */
+@keyframes rv-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes rv-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes rv-pulse-accent {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(195, 90, 56, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 16px rgba(195, 90, 56, 0);
+  }
+}
+
+.reveal {
+  opacity: 0;
+  animation: rv-fade-up var(--duration-slow) var(--ease-out) forwards;
+}
+
+.reveal-1 { animation-delay: 60ms; }
+.reveal-2 { animation-delay: 130ms; }
+.reveal-3 { animation-delay: 220ms; }
+.reveal-4 { animation-delay: 310ms; }
+.reveal-5 { animation-delay: 400ms; }
+.reveal-6 { animation-delay: 490ms; }
+
+.pulse-accent {
+  animation: rv-pulse-accent 1.6s var(--ease-in-out) infinite;
+}
+
+/* === Skeleton shimmer === */
+@keyframes rv-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--paper-sunken) 0%,
+    var(--surface) 45%,
+    var(--paper-sunken) 90%
+  );
+  background-size: 200% 100%;
+  animation: rv-shimmer 1.6s linear infinite;
+  border-radius: var(--radius-input);
+}
+
+/* === Reduced motion respect === */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  body::before {
+    opacity: 0.18;
+  }
+}
+
+/* === Selection === */
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent-deep);
+}
+
+/* === Scrollbar (subtle, paper-toned) === */
+@media (pointer: fine) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule-strong) transparent;
+  }
+}

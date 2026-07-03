@@ -1,0 +1,48 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1771870356913,
+      "tag": "0000_outgoing_satana",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1771931620510,
+      "tag": "0001_workable_beyonder",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1772094373815,
+      "tag": "0002_add-cascade-recipe-versions-changed-by",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1778664337427,
+      "tag": "0003_tiresome_silk_fever",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1778667278363,
+      "tag": "0004_famous_molten_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1782889339285,
+      "tag": "0005_chubby_lizard",
+      "breakpoints": true
+    }
+  ]
+}

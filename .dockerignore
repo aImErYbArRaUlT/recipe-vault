@@ -1,0 +1,14 @@
+# Build context excludes. Keeps the image small and the build reproducible.
+node_modules
+.next
+out
+build
+.git
+.github
+ios
+android
+coverage
+*.tsbuildinfo
+npm-debug.log*
+.env*
+.DS_Store
