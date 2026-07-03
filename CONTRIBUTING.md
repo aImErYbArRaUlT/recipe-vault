@@ -39,7 +39,7 @@ npm run test
 - Keep route handlers thin. Business logic and database access live in `src/lib/services` and go through the shared data-access helpers.
 - All queries must be scoped to the authenticated user. Check ownership before any update or delete.
 - Enforce feature gating server-side for every paid feature, not just in the UI.
-- Comments: a short JSDoc block (2 lines max) is allowed at the top of a file. Everywhere else use single-line `//` comments. Do not use em dashes anywhere.
+- Comments: a short JSDoc block (2 lines max) is allowed at the top of a file. Everywhere else use single-line `//` comments.
 - Validate API inputs with Zod.
 
 ## Pull requests
